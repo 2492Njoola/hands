@@ -1,102 +1,81 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hands_test/core/utils/constants.dart';
 import 'package:hands_test/features/interpreter/controller/interpreter_viewmodel.dart';
 import 'package:hands_test/features/interpreter/presentation/call_screen.dart';
+import 'package:hands_test/model/interpreter.dart';
 
 class InterpreterScreen extends GetWidget<InterpreterViewModel> {
   const InterpreterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 14,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CircleAvatar(
-            radius: 45,
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, size: 48, color: Colors.white),
-          ),
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  const TextSpan(
-                    text: "Hello, ",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                  TextSpan(
-                    text: controller
-                        .interpreterData!.fullName, // User's email or fallback
-                    style: const TextStyle(
-                      fontSize: 24, // Same size for consistency
-                      fontWeight: FontWeight.w400,
-                      color: Color(
-                          0xFF236868), // Different color (Teal) for distinction
-                    ),
-                  ),
-                ],
-              ),
+    return StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection("Calls")
+            .where("interpreter_id", isEqualTo: AppConstants.userId)
+            .where("request", isEqualTo: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Get.defaultDialog(
+              title: "Video Call",
+              content: Text("Request to call"),
+              onConfirm: () {
+                // FirebaseFirestore.instance.collection("Calls").
+              },
+              onCancel: () {},
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 40,
             ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2, // Two cards per row
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 1.2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('Interpreter')
-                      .where('request_call', isEqualTo: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      Get.snackbar(
-                        "Request",
-                        "Student sent to you request for call",
-                        colorText: Colors.green,
-                        snackPosition: SnackPosition.TOP,
-                        duration: const Duration(seconds: 4),
-                      );
-                    }
-                    final interpreters = snapshot.data!.docs;
-                    return interpreters.isEmpty
-                        ? GradientCard(
-                            title: "Emergency \nSession",
-                            icon: Icons.warning,
-                            startColor: Colors.redAccent,
-                            endColor: Colors.deepOrangeAccent,
-                            onTap: () {},
-                          )
-                        : GradientCard(
-                            title: "Emergency \nSession",
-                            icon: Icons.warning,
-                            startColor: Colors.redAccent,
-                            endColor: Colors.deepOrangeAccent,
-                            onTap: () => Get.to(() => const CallScreen()),
-                          );
-                  },
+                Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 45,
+                      backgroundColor: Colors.white,
+                      backgroundImage: AssetImage(
+                        "assets/images/HandsInWordsLogo.png",
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Hello, ",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          controller.interpreterData!.fullName!,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF236868),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 44),
+                const InterpreterStreamWidget(),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 }
 
@@ -187,6 +166,90 @@ class GradientCard extends StatelessWidget {
         color: Colors.white.withOpacity(0.20), // More subtle transparency
         shape: BoxShape.circle,
       ),
+    );
+  }
+}
+
+class EmergencyButton extends StatefulWidget {
+  final bool requested;
+  const EmergencyButton({super.key, required this.requested});
+
+  @override
+  State<EmergencyButton> createState() => _EmergencyButtonState();
+}
+
+class _EmergencyButtonState extends State<EmergencyButton> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GridView.count(
+        crossAxisCount: 2, // Two cards per row
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 1.2,
+        children: [
+          GradientCard(
+            title: "Emergency \nSession",
+            icon: Icons.warning,
+            startColor: Colors.redAccent,
+            endColor: Colors.deepOrangeAccent,
+            onTap: widget.requested
+                ? () => Get.to(() => const CallScreen())
+                : () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class InterpreterStreamWidget extends StatefulWidget {
+  const InterpreterStreamWidget({super.key});
+
+  @override
+  State<InterpreterStreamWidget> createState() =>
+      _InterpreterStreamWidgetState();
+}
+
+class _InterpreterStreamWidgetState extends State<InterpreterStreamWidget> {
+  bool? _previousRequestCall;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('Interpreter')
+          .doc(AppConstants.userId)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data?.data() == null) {
+          return const EmergencyButton(requested: false);
+        }
+
+        final interpreter = Interpreter.fromJson(snapshot.data!.data());
+        final currentRequestCall = interpreter.requestCall ?? false;
+
+        // Show SnackBar if the value changed and is true
+        if (_previousRequestCall != null &&
+            _previousRequestCall != currentRequestCall &&
+            currentRequestCall == true) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Interpreter has requested a call')),
+            );
+          });
+        }
+
+        // Update the previous value
+        _previousRequestCall = currentRequestCall;
+
+        return EmergencyButton(requested: currentRequestCall);
+      },
     );
   }
 }

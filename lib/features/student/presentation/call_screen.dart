@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:get/get.dart';
 import 'package:hands_test/core/services/agora_service.dart';
+import 'package:hands_test/features/student/presentation/home_screen.dart';
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});
@@ -249,7 +251,7 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   void _onCallEnd(BuildContext context) {
-    Navigator.pop(context);
+    Get.offAll(() => HomeScreen());
   }
 
   void _onToggleMute() {
@@ -284,24 +286,24 @@ class _CallScreenState extends State<CallScreen> {
         child: Stack(
           children: <Widget>[
             _viewRows(),
-            _panel(),
+            // _panel(),
             _toolbar(),
-            Positioned(
-              top: 20,
-              left: 20,
-              child: IconButton(
-                icon: const Icon(Icons.info_outline, color: Colors.white),
-                onPressed: _onTogglePanel,
-              ),
-            ),
-            const Positioned(
-              top: 20,
-              right: 20,
-              child: Text(
-                'Channel: $channelName',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+            // Positioned(
+            //   top: 20,
+            //   left: 20,
+            //   child: IconButton(
+            //     icon: const Icon(Icons.info_outline, color: Colors.white),
+            //     onPressed: _onTogglePanel,
+            //   ),
+            // ),
+            // const Positioned(
+            //   top: 20,
+            //   right: 20,
+            //   child: Text(
+            //     'Channel: $channelName',
+            //     style: TextStyle(color: Colors.white),
+            //   ),
+            // ),
           ],
         ),
       ),

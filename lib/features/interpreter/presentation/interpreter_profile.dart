@@ -8,11 +8,7 @@ class InterpreterProfile extends GetWidget<InterpreterViewModel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text("User Profile"),
-      //   centerTitle: true,
-      //   backgroundColor: Colors.blueAccent,
-      // ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -21,43 +17,34 @@ class InterpreterProfile extends GetWidget<InterpreterViewModel> {
             const SizedBox(height: 20),
             // Profile Picture
             const CircleAvatar(
-              radius: 60,
-              // backgroundImage: AssetImage(
-              //     'assets/profile.jpg'), // Change to user's profile image
+              radius: 80,
+              backgroundColor: Colors.white,
+              backgroundImage: AssetImage("assets/images/HandsInWordsLogo.png"),
+              // child: Icon(Icons.person, size: 48, color: Colors.white),
             ),
             const SizedBox(height: 15),
-            Text(
-              "${controller.interpreterData!.fullName}",
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "${controller.interpreterData!.email}", // Example email
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
+
             const SizedBox(height: 20),
-            const ListTile(
-              leading: Icon(
-                Icons.phone,
+            ListTile(
+              leading: const Icon(
+                Icons.person,
                 color: Colors.blueAccent,
               ),
               title: Text(
-                "+965 123 45678",
+                controller.interpreterData!.fullName!,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ), // Example phone number
             ),
-            const ListTile(
-              leading: Icon(
-                Icons.location_on,
+            ListTile(
+              leading: const Icon(
+                Icons.email,
                 color: Colors.blueAccent,
               ),
               title: Text(
-                "Kuwait City, Kuwait",
+                "${controller.interpreterData!.email}",
               ), // Example location
             ),
             const ListTile(

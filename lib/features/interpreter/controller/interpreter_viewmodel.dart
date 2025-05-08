@@ -21,7 +21,7 @@ class InterpreterViewModel extends GetxController {
 
   List<String> appBars = const [
     'Home',
-    'Profile',
+    'My Profile',
   ];
 
   RxBool action = false.obs;
